@@ -1,0 +1,47 @@
+<html>
+<head>
+<title>CSS / JavaScript date picker</title>
+<!-- This is needed to hide the div containing the date picker. Maybe it should
+     go below, into the "style" attribute of the div instead -->
+<style type="text/css">
+  div.calendar_widget { position: absolute; top: 0px; left: 0px; width:140px; height: 200px; display: none; }
+</style>
+<style type="text/css">
+  div.downloadlist { float:right; border: 1px; background-color: e0e0ff; padding: 4px; border-style: outset; }
+  div.downloadlist ul { list-style: none; margin: 4px; }
+</style>
+<script type="text/javascript" src="date-picker.js"></script>
+</head>
+<body>
+<div class="downloadlist">
+Download
+<ul>
+<li><a href="date-picker-0.02.tar.gz">v0.02</a> - 01.11.2003</li>
+<li>v0.01 - 31.10.2003</li>
+</ul>
+</div>
+<p>This is a small prototype for a date picker widget that is suited for templates and for browsers which
+do not support the advanced features it needs (CSS, DOM Level 2, JavaScript enabled). It is intended to
+be as unintrusive to your templates as possible, currently it requires that you put your date edit
+widgets into a span together with the link to open the date picker.</p>
+Date picker #1:
+<span>
+<input id='date' onclick="javascript:void(0);" name="date" value="8.11.2003" class="calendar">
+<a href="#" onclick="javascript:show_calendar_widget(this);" id="date_link" class="calendar-link">...</a>
+</span>
+<p>Unfortunately the <tt>iframe</tt> used to display the date picker cannot be created dynamically on demand,
+as the loading of the <tt>iframe</tt> content would possibly take too long.</p>
+Date picker #2, moved over :
+<span>
+<input id='date' onclick="javascript:void(0);" name="date" value="26.1.2002" class="calendar">
+<a href="#" onclick="javascript:show_calendar_widget(this);" id="date_link" class="calendar-link">...</a>
+</span>
+<p>This is an early release of the date picker and only has been tested against IE6 and Mozilla/Phoenix. 
+I won't bother to backport it to NS4 or IE5, but if you provide me with small patches for recent versions
+of Opera and Safari, I'll see what I can do to incorporate these. The code is released under the artistic
+license.</p>
+<p align="right"><tt><a href="http://www.corion.net/">corion at corion dot net</a></tt></p>
+<!-- This picker should go to the end of your page template -->
+<div class="calendar_widget" id="calendar_widget"><iframe id='calendar_widget_iframe' name='calendar_widget_iframe' style="border: none;" width=100% height=100% src="calendar_widget.html" /></div>
+</body>
+</html>

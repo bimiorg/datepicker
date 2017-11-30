@@ -1,0 +1,16 @@
+body  { margin: 0px; background-color: e0e0e0; }
+table.calendar_widget { font-family: 'Arial'; font-size: 12; cell-padding: 0px ; cell-spacing: 0px; }
+table.calendar_widget td a:link { text-decoration: none; color: black; }
+table.calendar_widget td a:visited { text-decoration: none; color: black; }
+td { border-width: 1px; text-align: center; }
+td.month_year_display { text-align: center; }
+td.button_display { text-align: none; width=100%; }
+td.clear_button_display { text-align: left; }
+td.close_button_display { text-align: right; }
+td.weekday { background-color: f0f0f0; }
+td.weekend { background-color: b0b0b0; }
+span.today { background-color: a0a0a0; }
+span.other_month { color: b0b0b0; }
+span.current_selection { border-style: dotted; border-width: 1px; }
+td.number { cursor: default; }
+td.number:hover { background-color: c0c0c0; }
