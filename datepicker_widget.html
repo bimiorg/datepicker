@@ -1,0 +1,328 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+	Datepicker Widget by Micah Andersen <micah@bimi.org>
+	Based on:
+	Javascript Datepicker by Corion <corion@corion.net>
+	Released under the Artistic License
+
+	Additions:
+		-This disclaimer
+		-HTML DOCTYPE
+		-intpad() to pad numbers with 0s
+		-Month View
+			-month view - month selection buttons, previous/next year buttons, selected year display
+			-month_cells() greps the month view <div>s and returns the ones used as month buttons
+			-same_month() checks that the 2 dates have the same year and month
+			-'Aug 2017' is now a button that leads to month view
+			-[month] text button added between [clear] and [close]
+			-display_month() now toggles away from month view if that was displayed last
+			-month_select_show() toggles to month view after setting the month names and link values based on the current day and year
+			-month_select_click() changes current month based on the month clicked on, they displays calendar view for that month
+			-month_year_left_click() and month_year_right_click() move back/forward 1 year, refresh month view
+		-resize container based on content height
+			-collect container_widget object with new set_container()
+			-new resize_container() sets parent height to datepicker content height
+			-call resize_container() when toggling between calendar and month view
+		-close datepicker when focus is lost (optimal)
+			-if this is IE, we do this in datepicker.js on the parent document
+			-if this is Chrome (focus is broken on iframes), then we check mouse click
+		-block keypresses in datepicker (especially backspace-to-go-back)
+	Modifications:
+		-Calendar config data was moved from external file into the script below
+		-English month names
+		-Date format changed to standard HTML5 datepicker/ISO format (YYYY-MM-DD)
+		-strftime() now pads month and day values with a zero if they are <2 digits
+		-strptime() now calls parseInt() with '10' as the second parameter to use base-10 numeric parsing
+			-this fixes an obscure bug that causes August 8 (2017-08-08) to be interpreted as 2 octal numbers
+		-calendar_cells() now checks for 'number' as *one* of the classes in use, not the *only* class
+		-modified calendar table and display_month() so Sunday is the first day of the week
+		-calendar cells now can have multiple style classes (e.g. number + today + current_selection)
+		-calendar cells now have <span>/<td> onclick links instead of <a> onclick links
+		-close_widget() now uses new container_widget object
+		-[clear], [close] text buttons moved above calendar
+		-angle buttons and text buttons now use their own CSS classes
+		-weekend style on weekend days
+	Deletions:
+		-none
+-->
+<html>
+<head>
+<link rel="stylesheet" href="datepicker.css" />
+<script>
+var month_names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var date_format = '%Y-%m-%d';
+
+function map(code,list) {
+  var result = [];
+  for (var i = 0; i < list.length; i++) {
+    result.push( code(list[i]));
+  };
+  return result;
+};
+
+function grep(code,list) {
+  var result = [];
+  for (var i = 0; i < list.length; i++) {
+    if (code(list[i])) {
+      result.push( list[i]);
+    };
+  };
+  return result;
+};
+	
+function intpad(integer){
+	var tmp = "0"+integer;
+	return tmp.substr(tmp.length-2);
+}
+
+function strftime(format,date) {
+  var result = format;
+  result = result.replace( /%Y/, date.getFullYear());
+  result = result.replace( /%m/, intpad(date.getMonth()+1));
+  result = result.replace( /%d/, intpad(date.getDate()));
+  return result;
+};
+
+function strptime(format,text) {
+  var result = new Date();
+  // quote meta chars
+  var s = '^' + format.replace( /([][.\*])/g, '\\$1') + '$';
+  var re_format = new RegExp( s.replace(/%[Ymd]/g,'(\\d+)'));
+  var match = text.match( re_format );
+
+  if (match) {
+    // Throw away the full string that appears for some weird reason
+    match.shift();
+    // we have a valid, matching date
+    var date_parts = new Object();
+    date_parts['Y'] = result.getFullYear();
+    date_parts['m'] = result.getMonth();
+    date_parts['d'] = result.getDate();
+	
+    order = format.match( /%[Ymd]/g );
+    for (var i = 0; i < order.length; i++) {
+      date_parts[order[i].substr(1,1)] = parseInt(match[i],10);
+    };
+
+    if (date_parts['Y'] < 100) { date_parts += 2000; };
+    result = new Date(date_parts.Y, date_parts.m-1, date_parts.d);
+  };
+  return result;
+};
+
+function calendar_cells() {
+  var table = document.getElementById('calendar_widget');
+  return grep( function(i){ return i.className.indexOf('number') != -1}, table.getElementsByTagName('td'));
+};
+function month_cells() {
+  var table = document.getElementById('month_widget');
+  return grep( function(i){ return i.className.indexOf('month') != -1}, table.getElementsByTagName('div'));
+};
+
+function add_days(date,delta) {
+  // get the calendar date 24h before the current date:
+  var result = new Date();
+  result.setTime(date.getTime() + delta*(24 * 60 * 60 *1000) );
+  if (result.getDate() == date.getDate()) {
+    // Ooops - date had more than 24 hours to it (DST!)
+    result.setTime( result.getTime() + (delta > 0 ? 1 : -1 ) *60 * 60 * 1000);
+  };
+
+  // Clamp the time to the original time:
+  result.setHours( date.getHours());
+
+  return result;
+};
+
+function day_before(date) { return add_days(date,-1); };
+function day_after(date) { return add_days(date, 1); };
+function first_of_month(date) { return new Date( date.getFullYear(), date.getMonth(), 1 ); };
+function prev_month(date) { return day_before( first_of_month( date )); };
+function next_month(date) { return add_days( first_of_month( date ),32 ); };
+function prev_year(date) { var result = date; result.setYear( date.getFullYear() -1 ); return result; };
+function next_year(date) { var result = date; result.setYear( date.getFullYear() +1 ); return result; };
+
+var container_widget;
+var target_widget;
+var current_day = new Date(2003,9,15);
+var display_day = new Date();
+
+function same_day(d1,d2) { return d1.getDate() == d2.getDate() && d1.getMonth() == d2.getMonth() && d1.getFullYear() == d2.getFullYear() };
+function same_month(d1,d2) { return d1.getMonth() == d2.getMonth() && d1.getFullYear() == d2.getFullYear() };
+
+function display_month(month) {
+  if (! document.getElementById)
+    return;
+  var first = first_of_month( month );
+  var today = new Date;
+
+  if (! document.getElementById) {
+    alert("document.getElementById not supported");
+    alert(document);
+  };
+
+  var table = document.getElementById('calendar_widget');
+  var month_year_display = document.getElementById('month_year_display');
+  month_year_display.innerHTML = "<span class='month_button link' onclick='javascript:month_select_show();'>" + month_names[month.getMonth()] + " " + month.getFullYear() + "</span>";
+
+  // Find the date for the upper left corner:
+  var curr = day_before(first);
+  while (curr.getDay() != 0) curr = day_before(curr);
+	  
+  var cells = calendar_cells();
+  for (var offset = 0; offset < cells.length; offset++) {
+    var span_class = '';
+    if (curr.getMonth() != month.getMonth()) { span_class = 'other_month' };
+    if (same_day(curr,today)) { span_class += ' today' };
+    if (same_day(curr,current_day)) { span_class += ' current_selection' };
+	cells[offset].innerHTML = '<span class="'+span_class+'" onclick="javascript:day_select_click('+curr.getFullYear()+','+(curr.getMonth())+','+curr.getDate()+')">' + curr.getDate() + '</span>';
+    curr = day_after( curr );
+  };
+  display_day = month;
+  
+  if (table.style.display == 'none'){
+	var month_widget = document.getElementById('month_widget');
+	table.style.display = month_widget.style.display;	//use browser styles - ugh for 'standards' that are deliberately not compatible
+	month_widget.style.display = 'none';
+	resize_container();				//resize container to fit date picker
+  }
+};
+	
+function month_select_show() {
+	var table = document.getElementById('calendar_widget');
+	var month_widget = document.getElementById('month_widget');
+	
+	var cells = month_cells();
+	var today = new Date;
+	for (var offset = 0; offset < 12; offset++) {
+		var curMonth = new Date( display_day.getFullYear(), offset, 1 );
+		//alert(curMonth);
+		var span_class = '';
+		if (same_month(curMonth,today)) { span_class = 'this_month' };
+		if (same_month(curMonth,current_day)) { span_class += ' selected_month' };
+		cells[offset].outerHTML = '<div class="'+span_class+' month number" onclick="javascript:month_select_click('+display_day.getFullYear()+','+offset+','+display_day.getDate()+')">' + month_names[offset] + '</div>';
+	};
+	document.getElementById("month_year").innerHTML = display_day.getFullYear();
+	
+	if (month_widget.style.display == 'none'){
+		month_widget.style.display = table.style.display;	//use browser styles - ugh for 'standards' that are deliberately not compatible
+		table.style.display = 'none';
+		resize_container();				//resize container to fit month picker
+	}
+}
+	
+function month_select_click(year,month,day) {
+	display_day = new Date(year,month,day);
+	display_month(display_day);
+};
+
+function close_widget() {
+	container_widget.style.display = 'none';
+};
+	
+function set_container(widget) { 
+	container_widget = widget;
+	resize_container();
+};
+
+function set_edit(widget) { 
+	target_widget = widget; 
+	current_day = strptime( date_format, target_widget.value ); 
+	display_month(current_day); 
+};
+	
+function resize_container() {
+	var body = document.documentElement;
+	//alert (container_widget.style.height + "," + body.offsetHeight + "," + body.clientHeight);
+	if (body.offsetHeight) {
+		var offset = body.offsetHeight;
+		if (offset != body.clientHeight){
+			offset += 2;
+		}
+    } else {
+      	var offset = body.clientHeight;
+    };
+	container_widget.style.height = offset + "px";
+};
+
+function update_selection(date) {
+  var s = date != '' ? strftime(date_format,date) : '';
+  target_widget.value = s;
+};
+	
+var debug = false;
+	
+if (!(document.all) && !debug) {	//non-IE browsers
+	document.onblur = function(){
+		close_widget();
+	};
+}
+if (window.chrome && !debug) {		//chrome 'work-around'
+	window.parent.document.onmousedown = function(){
+		close_widget();
+	};
+}
+document.onkeydown = function (event) {	//block keypresses (prevents unintended backspace-to-go-back)
+	var e = event || window.event;
+	if (!(document.all)){
+		e.preventDefault();
+	}
+	e.returnValue = false;
+	return false;
+}
+
+function month_left_click(widget) { display_month( prev_month( display_day )); };
+function month_right_click(widget) { display_month( next_month( display_day ));};
+function year_left_click(widget) { display_month( prev_year( display_day )); };
+function year_right_click(widget) { display_month( next_year( display_day )); };
+function month_year_left_click(widget) { display_day = prev_year( display_day ); month_select_show(); };
+function month_year_right_click(widget) { display_day = next_year( display_day ); month_select_show(); };
+function clear_button_click(widget) { update_selection( '' ); close_widget(); };
+function close_button_click(widget) { close_widget() };
+function day_select_click(year,month,day) { var selected = new Date(year,month,day); update_selection(selected); close_widget(); };
+</script>
+</head>
+<body onload="display_month(display_day);">
+<table width="100%" height="100%" class="calendar_widget" id="calendar_widget">
+	<tr>
+		<td colspan="7"><span class="text_button link" onclick="javascript:clear_button_click(this)">[clear]</span><span class="text_button link" onclick="javascript:month_select_show();">[month]</span><span class="text_button link" onclick="javascript:close_button_click(this)">[close]</span></td>
+	</tr>
+	<!--  &#xAB; &#x2039; &bull; &#x203A; &#xBB; -->
+	<tr>
+		<td id="year_left" class="angle_button" onclick="javascript:year_left_click(this)">&#xAB;</td>
+		<td id="month_left" class="angle_button" onclick="javascript:month_left_click(this)">&#x2039;</td>
+		<td colspan="3" id="month_year_display">Month</td>
+		<td id="month_right" class="angle_button" onclick="javascript:month_right_click(this)">&#x203A;</td>
+		<td id="year_right" class="angle_button" onclick="javascript:year_right_click(this)">&#xBB;</td>
+	</tr>
+	<tr>
+		<td class="weekday weekend">S</td><td class="weekday">M</td><td class="weekday">T</td><td class="weekday">W</td><td class="weekday">T</td><td class="weekday">F</td><td class="weekday weekend">S</td>
+	</tr>
+	<tr>
+		<td class="number weekend">1</td><td class="number">2</td><td class="number">3</td><td class="number">4</td><td class="number">5</td><td class="number">6</td><td class="number weekend">7</td>
+	</tr>
+	<tr>
+		<td class="number weekend">8</td><td class="number">9</td><td class="number">10</td><td class="number">11</td><td class="number">12</td><td class="number">13</td><td class="number weekend">14</td>
+	</tr>
+	<tr>
+		<td class="number weekend">15</td><td class="number">16</td><td class="number">17</td><td class="number">18</td><td class="number">19</td><td class="number">20</td><td class="number weekend">21</td>
+	</tr>
+	<tr>
+		<td class="number weekend">22</td><td class="number">23</td><td class="number"><span class="current_selection">24</span></td><td class="number">25</td><td class="number">26</td><td class="number"><span class="today">27</span></td><td class="number weekend">28</td>
+	</tr>
+	<tr>
+		<td class="number weekend">29</td><td class="number">30</td><td class="number">31</td><td class="number">32</td><td class="number">33</td><td class="number">34</td><td class="number weekend">35</td>
+	</tr>
+	<tr>
+		<td class="number weekend">36</td><td class="number">37</td><td class="number">38</td><td class="number">39</td><td class="number">40</td><td class="number">41</td><td class="number weekend">42</td>
+	</tr>
+</table>
+<div width="100%" height="100%" class="calendar_widget" id="month_widget" style="display:none;">
+	<div class="picker_heading angle_button" onclick="javascript:month_year_left_click(this)">&#xAB;</div><div id="month_year" class="picker_heading">Year</div><div class="picker_heading angle_button" onclick="javascript:month_year_right_click(this)">&#xBB;</div><br/>
+	<div class="month number">Jan</div><div class="month number">Feb</div><div class="month number">Mar</div><br/>
+	<div class="month number">Apr</div><div class="month number">May</div><div class="month number">Jun</div><br/>
+	<div class="month number">Jul</div><div class="month number">Aug</div><div class="month number">Sep</div><br/>
+	<div class="month number">Oct</div><div class="month number">Nov</div><div class="month number">Dec</div><br/>
+</div>
+</body>
+</html>

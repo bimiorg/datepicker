@@ -1,0 +1,101 @@
+<style>
+	td { vertical-align:top; border:solid 1px;}
+</style>
+<p>Commit log from 'a1abc32' to '' (most recent changes are listed on top):</p><table>
+<tr>
+  <td>f39221e</td>
+  <td>Datepicker: close_widget() now uses new container_widget object</td>
+</tr>
+<tr>
+  <td>932ed10</td>
+  <td>Datepicker: add shadow, rounded corners, and adjusted border color to match Firefox datepicker</td>
+</tr>
+<tr>
+  <td>91cddd4</td>
+  <td>Datepicker: adjust datepicker widget height based on content height<br/>-add container_widget variable<br/>-add resize_container() to resize container &lt;div&gt;<br/>	-use body.offsetHeight if available, otherwise clientHeight<br/>	-if offsetHeight is not clientHeight, then add 2px<br/>		-clientHeight is the actual height displayed<br/>		-offsetHeight is the height occupied by the content<br/>		-offsetHeight is off by 2 in all browsers the first time around<br/>-add set_container() to collect container &lt;div&gt; and call resize_container()<br/>-call iframe.set_container(datepicker_widget) in show_datepicker_widget()<br/>-call resize_container() in display_month() and month_select_show()<br/>-reformat set_edit() to match new set_container()<br/><br/>-CSS fix for monthview header button height<br/></td>
+</tr>
+<tr>
+  <td>e647bbe</td>
+  <td>Datepicker: fix for findPos()<br/>-add clientLeft &amp; clientTop to offset calculation to include border widths<br/>-add preferred option to use obj.getBoundingClientRect() instead (fixes IE6 positioning issues)<br/>	-get scroll offsets from document viewport<br/>	-use window.scroll* if available instead of viewport offsets (fixes Chrome)<br/></td>
+</tr>
+<tr>
+  <td>aba5ade</td>
+  <td>Datepicker: index page - move js into &lt;head&gt; + link to datepicker_webkit.css if native datepicker is available</td>
+</tr>
+<tr>
+  <td>2d343a3</td>
+  <td>Datepicker: renames, code formatting/comments, minor improvements/fixes<br/>-rename date-picker.js to datepicker.js<br/>-rename calendar_widget.html to datepicker_widget.html<br/>-remove calendar_conf.js -&gt; added 2-line content to datepicker_widget.html<br/>-rename calendar_widget for container &lt;div&gt; to datepicker_widget<br/>-rename calendar_widget_iframe to datepicker_widget_iframe<br/><br/>-code format fixes/edits:<br/>	-add missing &#39;var&#39; for variable<br/>	-add missing semicolons for consistency<br/>	-add comments for browser-specific fixes<br/><br/>-minor improvements/fixes:<br/>	-move startup calls to create_calendar_widget() and attach_datepickers() into window.onload handler<br/>	-use renamed CSS file in datepicker_widget.html<br/>	-use new month_button class instead of inline CSS<br/>	-remove unused variable &#39;date&#39; in show_datepicker_widget()<br/>	-add new text_button class to [clear], [month], [close] buttons<br/></td>
+</tr>
+<tr>
+  <td>5940bba</td>
+  <td>Move webkit/blink native datepicker styles to datepicker_webkit.css<br/>-remove selection background color from datepicker text<br/>-show clear button, position to left of dropdown button, z-order to front<br/></td>
+</tr>
+<tr>
+  <td>f5b8216</td>
+  <td>Datepicker: rename CSS file + cleanup + new button classes<br/>-calendar-style.css renamed to datepicker.css<br/>-remove link styles (no more &lt;a&gt; links in datepicker)<br/>-added text and month button styles (avoid inline styles)<br/>	-text buttons have padding to improve look<br/>-move body-&gt;border up with other basic design directives, add comment for browser-chrome-adjust directives<br/></td>
+</tr>
+<tr>
+  <td>32124db</td>
+  <td>Datepicker: index - extra dateboxes for testing, remove any extra bits from dateboxes to eliminate any possible dependencies for testing</td>
+</tr>
+<tr>
+  <td>a44677c</td>
+  <td>Datepicker: block all keypresses in datepicker frame - prevents unintended backspace-to-go-back<br/>-comment adjustment<br/>-semicolon added for consistency<br/></td>
+</tr>
+<tr>
+  <td>88da3a0</td>
+  <td>Datepicker fixes and improvements<br/>-set attached datebox to readonly &amp; change the pointer to hand/click cursor (so users don&#39;t assume they can type)<br/>-fix angle buttons - onclick the whole table cell, not just the text label<br/></td>
+</tr>
+<tr>
+  <td>ab9640e</td>
+  <td>Give month button the &#39;button&#39; look + specify a uniform width for weekday columns</td>
+</tr>
+<tr>
+  <td>a8b9384</td>
+  <td>replace index test with lorem-ipsum + clean up second datebox to demonstrate that inline code on the dateboxes is unnecessary</td>
+</tr>
+<tr>
+  <td>a3a58ab</td>
+  <td>Workaround for broken focus in old Chrome (&lt;20)<br/>window.chrome would *normally* trigger on Opera-webkit too, but this code never runs on Opera because it supports the native datepicker from Opera 10+<br/>the same applies for newer Chrome (20+)<br/><br/>On Chrome only,<br/>-close datepicker on parent window mousedown<br/>-focus datepicker on delay (setTimeout)<br/>-show datepicker on datebox click (not just focus)<br/></td>
+</tr>
+<tr>
+  <td>f910cb7</td>
+  <td>Fixes &amp; Re-style to match Firefox datepicker<br/>-add weekend style to weekend days<br/>-fix calendar_cells() for weekend day cells (&gt;1 class)<br/>-fix this_month class never display b/c same level as month class<br/>-fix today class white text for contrast<br/>-fix: remove border on iframe in IE6<br/></td>
+</tr>
+<tr>
+  <td>a01edb0</td>
+  <td>test blink/webkit-specific styles for native datepicker</td>
+</tr>
+<tr>
+  <td>229977b</td>
+  <td>Datepicker: Automatically attach the datepicker to any &lt;input type=&quot;date&quot;&gt; elements on the page<br/>-remove event handlers from our test &lt;input&gt;<br/>-copy grep() function from calendar_widget.html<br/>-add date_inputs() function based on calendar_cells() from calendar_widget.html:<br/>	-grab all &lt;input&gt; elements<br/>	-use grep() to filter for:<br/>		-type=&quot;date&quot; 	for modern browsers, such as Firefox 52 and Internet Explorer 11<br/>		-type=date	for older browsers, specifically Internet Explorer 6<br/>	-return the filtered list<br/>-add attach_datepickers() function to set the onFocus event handler of each date_inputs() listitem<br/>-call the attach_datepickers() function on startup<br/><br/>NOTE: having the attach code as a separate function allows us to call it dynamically after new date inputs have been added to the page (e.g. Itemized Medical Expense Forms with the AJAX-generated form code)<br/></td>
+</tr>
+<tr>
+  <td>a74324c</td>
+  <td>Datepicker fixes and improvements<br/>-move datepicker container &lt;div&gt; CSS from container page to date-picker.js<br/>-remove commented dead code for old Netscape browsers<br/>-change angle_buttons (prev/next) from &lt;a href=&quot;#&quot;&gt; to &lt;span&gt;<br/>-change clear, month, and close buttons from &lt;a href=&quot;#&quot;&gt; to &lt;span class=&quot;link&quot;&gt;<br/>-add :hover CSS from .month:hover to .link and .angle_button to make them prev/next, close, clear, and month buttons actually look like buttons<br/>-add cursor:pointer to .angle_button so it&#39;s obviously clickable<br/><br/>NOTE: getting rid of &lt;a href=&quot;#&quot;&gt; keeps us from breaking #-based links (it changes the page url) AND it saves us from that annoying Windows XP navigation &#39;click&#39; sound!<br/></td>
+</tr>
+<tr>
+  <td>411870d</td>
+  <td>Datepicker: width wrapping fix for certain months in downlevel Firefox<br/>-merged top row of calendar view into one table cell to prevent wrapping caused by expanded columns<br/>-removed .clear_button_display, .month_button_display, .close_button_display, and .month_year_display as they are either:<br/>	-no longer used<br/>	-simply a duplicate for the text-align:center directive in td{}<br/></td>
+</tr>
+<tr>
+  <td>d3a788e</td>
+  <td>Datepicker: Added month view<br/>-new month view &lt;div&gt;s as a separate widget from the calendar view table<br/>	-previous/next year buttons with current year in between<br/>	-buttons for each month, 3 per row<br/>-clicking on &#39;June 2003&#39; toggles month view<br/>-new [month] button (between [clear] and [close]) to toggle month view<br/>-display_month() now toggles views back to the calendar if the month view was left open when datepicker was hidden<br/>-new functions:<br/>	-month_cells() returns the monthview &lt;div&gt;s that represent each month, in an array<br/>	-same_month() accepts two Dates and returns whether they are the same month of the same year<br/>	-month_select_show() toggles views from calendar to month view and updates it with the selected year and the month links for that year<br/>	-month_select_click() is called by the month links; it sets the new display month/day and then calls display_month to refresh calendar view<br/>	-month_year_left_click() is called by the previous month button; it sets new display year and calls month_select_show() to refresh month view<br/>	-month_year_right_click() is called by the next month button; it is otherwise identical<br/><br/>CSS changes:<br/>	-removed .button_display (unused)<br/>	-added td.month_button_display for new [month] button in calendar view<br/>	-added .this_month and .selected_month as month view versions of .today and .current_selection (includes a padding adjustment to allow for border width)<br/>	-added .picker_heading for month view first row - keeps prev/next year buttons and year display on one line with decent spacing<br/>	-added .month and .month:hover modelled on td.number for month links - monospace padded &lt;div&gt;s to look like clickable buttons<br/>	-note the #float:left + display:inline-block hack for IE&lt;8<br/></td>
+</tr>
+<tr>
+  <td>b82532b</td>
+  <td>Datepicker fixes and improvements<br/>-no longer require enclosing span tag or separate link, just use the date input as &quot;current widget&quot;<br/>	-if the current widget is an input, just use it, don&#39;t look for parent span&#39;s child input<br/>-dynamically determine whether using the datepicker is necessary for the current browser<br/>-create datepicker window at startup/runtime, rather than including it in the page code<br/>	-move existing creation code from show_calendar_widget() to new create_calendar_widget()<br/>-change &#39;Sept&#39; to &#39;Sep&#39; in month list (all use 3 characters)<br/>-auto-hide the datepicker on focus loss<br/>	-on datepicker create, append an onblur() handler to hide the widget on focus loss<br/>	-on datepicker show, claim the focus to allow focus loss to trigger handler<br/>	-add debug flag to date-picker.js and calendar_widget.html to disable auto-hide code for style debugging<br/>-fix &#39;08&#39; and &#39;09&#39; month/day not parsed bug - change parseInt() to parseInt(,10) - it was assuming octal<br/>-add intpad() function and pad output month and day with a zero if single-digit<br/>-add doctype element to calendar_widget.html<br/>-allow today, current_selection, and other_month CSS classes to be stacked if a particular day meets more than one criteria<br/>-change unnecessary &lt;a&gt; links for days into a single &lt;span&gt; per number; add cursor:pointer to CSS<br/>-move clear/close buttons to top<br/><br/>CSS:<br/>	-add cursor:pointer to .number<br/>	-add .link class for cursor:pointer<br/>	-add &#39;angle_button&#39; class (larger font, monospace) to prev/next month/year buttons<br/>	-fix invalid CSS<br/>		-remove cell-padding &amp; cell-spacing<br/>		-add # before all color values<br/>		-add px to font sizes<br/>	-move font-family &amp; font-size from .calendar_widget to body<br/>	-change font-family to Segoe-family san-serif fonts<br/>	-add padding:0px to body<br/>	-change .today, .other_month, .current_selection from td-specific to general classes<br/>	-modify td.number to be square-shaped &#39;block&#39;s<br/></td>
+</tr>
+<tr>
+  <td>3643c8a</td>
+  <td>Add date picker test to index</td>
+</tr>
+<tr>
+  <td>26aac73</td>
+  <td>Datepicker: fix quotes, missing end tag + shift week to start on Sunday</td>
+</tr>
+<tr>
+  <td>68af2a8</td>
+  <td>Datepicker: use English month names and shortDate format</td>
+</tr>
+</table>

@@ -1,0 +1,74 @@
+/*
+	Datepicker Widget by Micah Andersen <micah@bimi.org>
+	Based on:
+	Javascript Datepicker by Corion <corion@corion.net>
+	Released under the Artistic License
+
+	Additions:
+		-This disclaimer
+		-added classes:
+			-link
+			-text_button
+			-month_button
+			-angle_button
+			-this_month
+			-selected_month
+			-picker_heading
+			-month
+		-body, etc. styles to better mimic Firefox datepicker
+		-button styles so that clickable items are obvious (cursor, highlight, border, etc.)
+		-browser-specific directives to prevent pan/zoom/select/etc.
+	Modifications:
+		-change background color to white to mimic Firefox datepicker
+		-change font to Segoe-family
+		-change unnecessarily <td>-specific classes to generic ones
+		-change <span>-specific classes to <td>-specific ones
+		-fixes for invalid directives (e.g. font-size: 12 -> 12px)
+	Deletions:
+		-<a> link-specific classes
+		-invalid directives (cellpadding, cellspacing)
+		-deleted classes:
+			-month_year_display (text alignment moved to calendar_widget class)
+			-button_display
+			-clear_button_display
+			-close_button_display
+*/
+body { 
+	margin: 0px;
+	padding: 0px;
+	background-color: white;
+	border:1px solid #b2b2b2;
+	border-radius: 3px;
+	font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
+	font-size: 12px;
+	/* modify browser chrome */
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none; /* remove copy/paste buttons */
+	-ms-touch-action:none;	/* no pinch-zoom or pan on datepicker */
+	touch-action:none;	/* no pinch-zoom or pan on datepicker */
+	overflow:hidden;
+}
+.link { cursor: pointer; }
+.link:hover { background-color: #c0c0c0; }
+.calendar_widget { padding: 0px ; margin: 0px; width: 100%; text-align: center;}
+td { border-width: 1px; text-align: center; }
+.text_button { padding: 0px 4px 1px; }
+.month_button { border: 1px solid black; border-radius: 7px; display:block; }
+.angle_button { cursor: pointer; font-family: monospace; font-size: 18px; }
+.angle_button:hover { background-color: #c0c0c0; }
+td.weekday { background-color: #f0f0f0; width:14.28%; }
+td.weekend { color: #DE6259; }
+.today { background-color: #a0a0a0; color:white; }
+.other_month { color: #b0b0b0; }
+.current_selection { border-style: dotted; border-width: 1px; }
+td.number { margin: 0px; padding: 0px;}
+td.number span{cursor: pointer; display: block; vertical-align: middle;}
+td.number:hover { background-color: #c0c0c0; }
+.this_month { background-color: #a0a0a0 !important; }
+.selected_month { border-style: dotted; border-width: 1px; padding: 12.3px !important; }
+.picker_heading { display: inline-block; #float:left;  padding: 2px 14px 4px; }
+.month { font-family: monospace; background-color: #f0f0f0; cursor: pointer; display: inline-block; #float:left; padding: 13.3px; }
+.month:hover { background-color: #c0c0c0; }

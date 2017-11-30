@@ -1,0 +1,28 @@
+/*
+	Datepicker Widget by Micah Andersen <micah@bimi.org>
+	Released under the Artistic License
+*/
+input[type="date"]{
+	position: relative;
+	width: 130px;
+}
+input[type="date"]::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-year-field{
+	background-color: transparent;
+}
+input[type="date"]::-webkit-calendar-picker-indicator{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	padding: 7px 20px 5px 110px;
+	-webkit-appearance: visible;
+	background-color: transparent;
+}
+input[type="date"]::-webkit-inner-spin-button{
+	-webkit-appearance: none;
+}
+input[type="date"]::-webkit-clear-button{
+	position:absolute;
+	left:93px;
+	-webkit-appearance: visible;
+	z-index: 1;
+}

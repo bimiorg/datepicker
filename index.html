@@ -1,47 +1,48 @@
+<!--
+	Datepicker Widget by Micah Andersen <micah@bimi.org>
+	Based on:
+	Javascript Datepicker by Corion <corion@corion.net>
+	Released under the Artistic License
+
+	Additions:
+		-This disclaimer
+		-Browser capability check for native datepicker
+			-includes webkit datepicker stylesheet OR
+			-includes the datepicker script
+		-More date boxes
+		-Lorem Ipsum text & Usage descriptions
+	Modifications:
+		-Dateboxes are now just date <input>s
+	Deletions:
+		-all 'content' - this is now just a test page
+		-any local script or inline CSS not listed above
+-->
 <html>
 <head>
 <title>CSS / JavaScript date picker</title>
-<!-- This is needed to hide the div containing the date picker. Maybe it should
-     go below, into the "style" attribute of the div instead -->
-<style type="text/css">
-  div.calendar_widget { position: absolute; top: 0px; left: 0px; width:140px; height: 200px; display: none; }
-</style>
-<style type="text/css">
-  div.downloadlist { float:right; border: 1px; background-color: e0e0ff; padding: 4px; border-style: outset; }
-  div.downloadlist ul { list-style: none; margin: 4px; }
-</style>
-<script type="text/javascript" src="date-picker.js"></script>
+<script type="text/javascript">
+    var datefield=document.createElement("input")
+    datefield.setAttribute("type", "date")
+    if (datefield.type!="date"){ //if browser doesn't support input type="date", load datepicker
+        document.write("<script type='text/javascript' src='datepicker.js'><\/script>\n");
+    }else{
+		document.write("<link rel='stylesheet' type='text/css' href='datepicker_webkit.css'/>\n");
+	}
+</script>
 </head>
 <body>
-<div class="downloadlist">
-Download
-<ul>
-<li><a href="date-picker-0.02.tar.gz">v0.02</a> - 01.11.2003</li>
-<li>v0.01 - 31.10.2003</li>
-</ul>
-</div>
-<p>This is a small prototype for a date picker widget that is suited for templates and for browsers which
-do not support the advanced features it needs (CSS, DOM Level 2, JavaScript enabled). It is intended to
-be as unintrusive to your templates as possible, currently it requires that you put your date edit
-widgets into a span together with the link to open the date picker.</p>
+<h1>Datepicker Live Demo</h1>
+<p>This first set of datepickers use the <u>automatic attachment method</u>. Remember, the goal is to <i>emulate HTML5 date inputs for older browsers</i>, <b>not replace native datepickers in newer browsers</b>! That means that if your browsers supports native date inputs, you will see those, and this demo page will not help you much. :) <b>To see the code in action, try IE 6 or IE 11.</b> :P</p>
 Date picker #1:
-<span>
-<input id='date' onclick="javascript:void(0);" name="date" value="8.11.2003" class="calendar">
-<a href="#" onclick="javascript:show_calendar_widget(this);" id="date_link" class="calendar-link">...</a>
-</span>
-<p>Unfortunately the <tt>iframe</tt> used to display the date picker cannot be created dynamically on demand,
-as the loading of the <tt>iframe</tt> content would possibly take too long.</p>
+<input type="date" value="2003-11-08"><input type="date"><input type="date" value="2020-11-08">
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,<br/> sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 Date picker #2, moved over :
 <span>
-<input id='date' onclick="javascript:void(0);" name="date" value="26.1.2002" class="calendar">
-<a href="#" onclick="javascript:show_calendar_widget(this);" id="date_link" class="calendar-link">...</a>
+<input name="date" value="2002-1-26">
+<a href="#" onclick="javascript:show_datepicker_widget(this);">...</a>
 </span>
-<p>This is an early release of the date picker and only has been tested against IE6 and Mozilla/Phoenix. 
-I won't bother to backport it to NS4 or IE5, but if you provide me with small patches for recent versions
-of Opera and Safari, I'll see what I can do to incorporate these. The code is released under the artistic
-license.</p>
-<p align="right"><tt><a href="http://www.corion.net/">corion at corion dot net</a></tt></p>
-<!-- This picker should go to the end of your page template -->
-<div class="calendar_widget" id="calendar_widget"><iframe id='calendar_widget_iframe' name='calendar_widget_iframe' style="border: none;" width=100% height=100% src="calendar_widget.html" /></div>
+<p>The datepicker above uses the <u>manual attachment method</u> (manually inserting an onclick handler on the link). This is included because it was in the original version (it was the only way) and it may still be useful for those who wish to support REALLY old Firefox browsers (e.g. 3.6). <b>If your browser supports native date inputs (e.g. Firefox 57, Edge, or Chrome 20+), the '...' button will not function</b>, as the datepicker code is not automatically loaded on those browsers.</p>
+
+
 </body>
 </html>
