@@ -39,6 +39,7 @@
 		-calendar cells now can have multiple style classes (e.g. number + today + current_selection)
 		-calendar cells now have <span>/<td> onclick links instead of <a> onclick links
 		-close_widget() now uses new container_widget object
+		-update_selection() now triggers the <input>s onChange event handler (with simulated event object)
 		-[clear], [close] text buttons moved above calendar
 		-angle buttons and text buttons now use their own CSS classes
 		-weekend style on weekend days
@@ -248,6 +249,9 @@ function resize_container() {
 function update_selection(date) {
   var s = date != '' ? strftime(date_format,date) : '';
   target_widget.value = s;
+  var evt = {}; //create a dummy event object so any change event handler knows which object it's handling
+  evt.target = target_widget;
+  target_widget.onchange(evt);
 };
 	
 var debug = false;
