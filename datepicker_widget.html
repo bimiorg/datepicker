@@ -249,9 +249,11 @@ function resize_container() {
 function update_selection(date) {
   var s = date != '' ? strftime(date_format,date) : '';
   target_widget.value = s;
-  var evt = {}; //create a dummy event object so any change event handler knows which object it's handling
-  evt.target = target_widget;
-  target_widget.onchange(evt);
+  if (target_widget.onchange){
+	  var evt = {}; //create a dummy event object so any change event handler knows which object it's handling
+	  evt.target = target_widget;
+	  target_widget.onchange(evt);
+  }
 };
 	
 var debug = false;
