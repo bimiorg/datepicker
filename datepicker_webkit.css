@@ -6,9 +6,6 @@ input[type="date"]{
 	position: relative;
 	width: 130px;
 }
-input[type="date"]::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-year-field{
-	background-color: transparent;
-}
 input[type="date"]::-webkit-calendar-picker-indicator{
 	position: absolute;
 	top: 0px;
