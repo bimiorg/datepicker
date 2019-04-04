@@ -13,6 +13,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 	padding: 7px 20px 5px 110px;
 	-webkit-appearance: visible;
 	background-color: transparent;
+	.opacity: 1;
 }
 input[type="date"]::-webkit-inner-spin-button{
 	-webkit-appearance: none;
