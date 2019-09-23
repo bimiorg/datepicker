@@ -30,6 +30,7 @@
 		-create_datepicker_widget() added from creation code in show_calendar_widget()
 			-parent/container style moved into JS code to make the widget easier to include in various pages
 		-show_datepicker_widget() can be called directly from an <input> element now
+		-parent() renamed to getParentElement() to avoid global namespace collisions
 	Deletions:
 		-unused Netscape 4 positioning code
 		-unused date variable in show_datepicker_widget()
@@ -77,7 +78,7 @@ function findPos(obj) {
 	return pos;
 };
 
-function parent(widget) {
+function getParentElement(widget) {
   if (widget.parentElement) { return widget.parentElement; };
   if (widget.parentNode) { return widget.parentNode; };
   if (widget.parent) { return widget.parent; };
@@ -123,7 +124,7 @@ function show_datepicker_widget(widget) {
   if (! document.getElementsByTagName) { return; };
   // find edit widget
   if (widget.tagName.toLowerCase() != "input"){
-	  var edits = parent(widget).getElementsByTagName('input');
+	  var edits = getParentElement(widget).getElementsByTagName('input');
 	  if (edits.length > 1) {
 		alert("More than one date edit field found within the enclosing element");
 		return 0;
